@@ -71,32 +71,33 @@ export interface UIThemeDataV1 {
 
 export function getDefaultTheme(): UIThemeDataV1 {
   return {
-    dark: 'system',
+    dark: true,
     backgroundMusic: [],
     backgroundMusicPlayOrder: 'sequential',
     colors: {
-      lightAppBarColor: '#e0e0e0FF',
-      lightSideBarColor: '#FFFFFFFF',
-      darkAppBarColor: '#111111FF',
-      darkSideBarColor: '#11111166',
-      darkPrimaryColor: '#4caf50',
-      darkBackground: '#121212A5',
-      darkInfoColor: '#2196F3',
-      darkErrorColor: '#FF5252',
-      darkWarningColor: '#FB8C00',
-
-      darkSuccessColor: '#4CAF50',
-      darkAccentColor: '#00e676',
-      darkCardColor: '#0c0c0ccc',
-      lightPrimaryColor: '#1976D2',
-      lightBackground: '#FFFFFF',
-      lightInfoColor: '#2196F3',
-      lightErrorColor: '#FF5252',
-      lightWarningColor: '#FB8C00',
-      lightSuccessColor: '#4CAF50',
-      lightAccentColor: '#82B1FF',
-      lightCardColor: '#e0e0e080' },
-    backgroundColorOverlay: true,
+      // ── Lumen Launcher — monochrome glass theme ──
+      lightAppBarColor: '#f5f5f500',
+      lightSideBarColor: '#ffffff18',
+      darkAppBarColor: '#00000000',
+      darkSideBarColor: '#ffffff08',
+      darkPrimaryColor: '#ffffff',
+      darkBackground: '#000000',
+      darkInfoColor: '#aaaaaa',
+      darkErrorColor: '#ff4444',
+      darkWarningColor: '#ffaa00',
+      darkSuccessColor: '#66ff66',
+      darkAccentColor: '#e0e0e0',
+      darkCardColor: '#ffffff0a',
+      lightPrimaryColor: '#111111',
+      lightBackground: '#f5f5f5',
+      lightInfoColor: '#555555',
+      lightErrorColor: '#cc0000',
+      lightWarningColor: '#cc7700',
+      lightSuccessColor: '#007700',
+      lightAccentColor: '#333333',
+      lightCardColor: '#00000010',
+    },
+    backgroundColorOverlay: false,
     backgroundVolume: 1,
     backgroundImage: undefined,
     backgroundImageDark: undefined,
@@ -105,10 +106,12 @@ export function getDefaultTheme(): UIThemeDataV1 {
     font: undefined,
     fontSize: 16,
     blur: {
-      background: 3,
-      card: 20,
-      appBar: 3,
-      sideBar: 3 } }
+      background: 0,
+      card: 48,
+      appBar: 32,
+      sideBar: 48,
+    },
+  }
 }
 
 export function useStoredThemes() {

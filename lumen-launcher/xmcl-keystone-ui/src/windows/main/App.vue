@@ -57,6 +57,7 @@
 
 <script lang=ts setup>
 import '@/assets/common.css'
+import '@/assets/lumen.css'
 import AppImageDialog from '@/components/AppImageDialog.vue'
 import AppSharedTooltip from '@/components/AppSharedTooltip.vue'
 import { useAuthProfileImportNotification } from '@/composables/authProfileImport'

@@ -72,11 +72,11 @@ html {
        Override them programmatically by injecting `kSurfaceTokens`
        and writing to the refs (a future settings UI will wire here). */
     --surface-radius: 16px;                                              /* matches Vuetify `rounded="xl"` */
-    --surface-border: 1px solid rgba(var(--v-theme-on-surface), 0.10);
-    --surface-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.35);
+    --surface-border: 1px solid rgba(255, 255, 255, 0.08);
+    --surface-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.04);
 
     /* Frosted-glass background shared by dialogs, menus and popovers. */
-    --surface-bg: rgba(var(--v-theme-surface), 0.70);
+    --surface-bg: rgba(10, 10, 10, 0.60);
     --surface-blur: 64px;
 
     /* Menu-only: inner padding + list-item radius (dialogs don't share). */

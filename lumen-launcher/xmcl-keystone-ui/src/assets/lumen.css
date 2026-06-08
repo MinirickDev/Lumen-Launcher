@@ -1,0 +1,217 @@
+/* ═══════════════════════════════════════════════════════════════
+   LUMEN LAUNCHER — Liquid Glass Design System
+   Black & white, frosted glass, Apple Vision Pro × Lunar Client
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Root background ── */
+body,
+.v-application {
+  background: #000 !important;
+}
+
+/* ── App root: pure black canvas ── */
+.v-app,
+.v-application__wrap {
+  background: #000 !important;
+}
+
+/* ── Liquid glass sidebar ── */
+.sidebar {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(180%) !important;
+  backdrop-filter: blur(48px) saturate(180%) !important;
+}
+
+/* Sidebar items */
+.sidebar-item__icon,
+.sidebar .v-icon {
+  color: rgba(255, 255, 255, 0.55) !important;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.sidebar .router-link-active .sidebar-item__icon,
+.sidebar .router-link-active .v-icon {
+  color: #fff !important;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
+}
+
+/* ── System bar: transparent glass strip ── */
+.v-system-bar {
+  background: rgba(0, 0, 0, 0.15) !important;
+  -webkit-backdrop-filter: blur(32px) !important;
+  backdrop-filter: blur(32px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ── Main content area ── */
+main {
+  background: transparent !important;
+}
+
+/* ── Cards: liquid glass panels ── */
+.v-card,
+.v-sheet:not(.v-system-bar):not(.v-list) {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(150%) !important;
+  backdrop-filter: blur(40px) saturate(150%) !important;
+}
+
+/* ── Menus: deep glass ── */
+.v-menu > .v-overlay__content > .v-list,
+.v-menu > .v-overlay__content > .v-card,
+.v-menu > .v-overlay__content > .v-sheet {
+  background: rgba(12, 12, 12, 0.82) !important;
+  -webkit-backdrop-filter: blur(64px) saturate(180%) !important;
+  backdrop-filter: blur(64px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: 0 24px 64px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05) !important;
+}
+
+/* ── Dialogs: full liquid glass ── */
+.v-dialog > .v-overlay__content > *:first-child {
+  background: rgba(8, 8, 8, 0.78) !important;
+  -webkit-backdrop-filter: blur(80px) saturate(200%) !important;
+  backdrop-filter: blur(80px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: 0 32px 80px -16px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.04) !important;
+  border-radius: 24px !important;
+}
+
+/* ── Buttons ── */
+.v-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  color: #fff !important;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease !important;
+}
+.v-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  transform: translateY(-1px);
+}
+.v-btn:active {
+  transform: scale(0.97) !important;
+}
+/* Primary action button (launch, etc.) */
+.v-btn.v-btn--variant-elevated,
+.v-btn[color="primary"] {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #000 !important;
+  border-color: transparent !important;
+  font-weight: 600;
+}
+.v-btn.v-btn--variant-elevated:hover,
+.v-btn[color="primary"]:hover {
+  background: #fff !important;
+  box-shadow: 0 0 24px rgba(255,255,255,0.25) !important;
+}
+
+/* ── Text fields ── */
+.v-field {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  backdrop-filter: blur(16px) !important;
+  border-radius: 10px !important;
+}
+.v-field:focus-within {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+.v-field__outline {
+  display: none !important;
+}
+
+/* ── List items ── */
+.v-list {
+  background: transparent !important;
+}
+.v-list-item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+.v-list-item--active {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* ── Dividers ── */
+.v-divider {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── Typography ── */
+.v-application {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+.text-medium-emphasis,
+.v-list-item-subtitle {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ── Chips ── */
+.v-chip {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* ── Tabs ── */
+.v-tab {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+.v-tab--selected {
+  color: #fff !important;
+}
+.v-tabs-slider {
+  background: #fff !important;
+  height: 1.5px !important;
+  border-radius: 1px !important;
+}
+
+/* ── Progress bars / loading ── */
+.v-progress-linear__determinate {
+  background: #fff !important;
+}
+.v-progress-linear__buffer {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* ── Tooltips ── */
+.v-tooltip > .v-overlay__content {
+  background: rgba(10, 10, 10, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  backdrop-filter: blur(24px) !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  color: rgba(255,255,255,0.85) !important;
+}
+
+/* ── Home header overlay ── */
+.header-overlay {
+  background-image: linear-gradient(rgba(0,0,0,0.6), transparent) !important;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 4px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+}
+
+/* ── Lumen account switcher button (light override) ── */
+.lumen-account-btn {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ── Smooth global transitions ── */
+.v-card,
+.v-btn,
+.v-list-item,
+.v-field,
+.sidebar {
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
