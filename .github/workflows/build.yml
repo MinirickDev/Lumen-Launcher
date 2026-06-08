@@ -48,21 +48,13 @@ jobs:
             ${{ github.workspace }}/.cache/electron-builder
           key: ${{ runner.os }}-electron-${{ hashFiles('lumen-launcher/pnpm-lock.yaml') }}
 
-      - name: Cache Vite deps
-        uses: actions/cache@v4
-        with:
-          path: lumen-launcher/xmcl-keystone-ui/node_modules/.vite
-          key: ${{ runner.os }}-vite-${{ hashFiles('lumen-launcher/pnpm-lock.yaml') }}
-
       - name: Install dependencies
         working-directory: lumen-launcher
         run: pnpm install --frozen-lockfile
 
       - name: Setup Linux
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libarchive-tools
+        run: sudo apt-get update && sudo apt-get install -y libarchive-tools
 
       - name: Build renderer + app
         working-directory: lumen-launcher
@@ -74,12 +66,19 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=8192
           NODE_ENV: production
 
+      - name: List build output (debug)
+        if: always()
+        shell: bash
+        run: |
+          echo "=== Build output ==="
+          find lumen-launcher/xmcl-electron-app/build/output -maxdepth 2 2>/dev/null || echo "no output dir"
+
       - name: Zip Windows build
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Compress-Archive -Path lumen-launcher/xmcl-electron-app/build/output/win-unpacked/* `
-            -DestinationPath lumen-launcher-windows-x64.zip
+          $src = "lumen-launcher\xmcl-electron-app\build\output\win-unpacked"
+          Compress-Archive -Path "$src\*" -DestinationPath lumen-launcher-windows-x64.zip
 
       - name: Zip Linux build
         if: runner.os == 'Linux'
@@ -123,8 +122,7 @@ jobs:
       - name: Delete existing latest release and tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+        run: gh release delete latest --yes --cleanup-tag 2>/dev/null || true
 
       - name: Publish Release
         env:
@@ -132,15 +130,16 @@ jobs:
         run: |
           gh release create latest \
             --title "Lumen Launcher v${{ steps.ver.outputs.version }}" \
-            --notes "## 🌟 Lumen Launcher v${{ steps.ver.outputs.version }}
+            --notes "## Lumen Launcher v${{ steps.ver.outputs.version }}
 
-          | Platform | Descarga |
-          |----------|----------|
+          | Plataforma | Archivo |
+          |------------|---------|
           | 🪟 Windows x64 | \`lumen-launcher-windows-x64.zip\` |
           | 🐧 Linux x64   | \`lumen-launcher-linux-x64.zip\`   |
 
-          **Instrucciones Windows:** Extrae el ZIP → ejecuta \`lumen-launcher.exe\` (no requiere instalación).
+          **Windows:** Extrae el ZIP → ejecuta \`lumen-launcher.exe\` (portable, sin instalación).
+          **Linux:** Extrae el ZIP → ejecuta \`./linux-unpacked/lumen-launcher\`.
 
-          Build #${{ github.run_number }} · ${{ github.sha }}" \
+          Build #${{ github.run_number }}" \
             dist/windows-zip/lumen-launcher-windows-x64.zip \
             dist/linux-zip/lumen-launcher-linux-x64.zip
