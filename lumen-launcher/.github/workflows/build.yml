@@ -142,6 +142,5 @@ jobs:
 
           **Windows:** Extrae el ZIP y ejecuta \`lumen-launcher.exe\` — no requiere instalación.
           **Linux:** Extrae el ZIP y ejecuta \`./lumen-launcher\`." \
-            --prerelease \
             dist/windows-zip/lumen-launcher-windows-x64.zip \
             dist/linux-zip/lumen-launcher-linux-x64.zip
