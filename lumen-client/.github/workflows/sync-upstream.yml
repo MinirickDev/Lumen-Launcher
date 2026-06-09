@@ -1,0 +1,88 @@
+name: Sync Upstream Meteor
+
+# Runs every Monday at 08:00 UTC — checks if Meteor Client has new commits
+on:
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:   # allow manual trigger from GitHub Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Lumen Client
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/MeteorDevelopment/meteor-client || true
+          git fetch upstream master --depth=50
+
+      - name: Check for new upstream commits
+        id: check
+        run: |
+          UPSTREAM_SHA=$(git rev-parse upstream/master)
+          MERGE_BASE=$(git merge-base HEAD upstream/master 2>/dev/null || echo "none")
+          if [ "$MERGE_BASE" = "$UPSTREAM_SHA" ]; then
+            echo "up_to_date=true" >> $GITHUB_OUTPUT
+            echo "No new upstream commits."
+          else
+            echo "up_to_date=false" >> $GITHUB_OUTPUT
+            COMMITS=$(git log --oneline HEAD..upstream/master | head -10)
+            echo "NEW_COMMITS<<EOF" >> $GITHUB_OUTPUT
+            echo "$COMMITS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "New commits found."
+          fi
+
+      - name: Create sync branch and PR
+        if: steps.check.outputs.up_to_date == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date +%Y%m%d)
+          BRANCH="sync/upstream-$DATE"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+
+          # Attempt merge — conflicts will need manual resolution
+          git merge upstream/master --no-edit -m "chore: sync upstream Meteor Client $DATE" || true
+
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "chore: sync upstream Meteor Client ($DATE)" \
+            --body "$(cat <<'EOF'
+          ## Upstream Meteor Client sync
+
+          This PR was opened automatically. It merges the latest commits from
+          [MeteorDevelopment/meteor-client](https://github.com/MeteorDevelopment/meteor-client) master branch.
+
+          ### New upstream commits
+          ${{ steps.check.outputs.NEW_COMMITS }}
+
+          ### Before merging
+          - Check `src/main/java/.../systems/modules/Modules.java` — our removed modules must stay removed.
+          - Check `gradle/libs.versions.toml` — if Minecraft version bumped, update dependent mod versions too.
+          - Build locally: `./gradlew build`
+
+          ### Saving this as a version
+          After merging, tag it:
+          ```
+          git tag v{mc_version}-lumen-{n}
+          git push --tags
+          ```
+          EOF
+          )" \
+            --base main \
+            --head "$BRANCH" || echo "PR already exists or branch is up to date."

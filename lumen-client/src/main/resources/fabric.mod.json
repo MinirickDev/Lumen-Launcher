@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "name": "Lumen Client",
+  "id": "meteor-client",
+  "version": "${version}",
+  "description": "Lumen Client — a curated Minecraft utility mod. Powered by Meteor Client.",
+  "authors": [
+    "MineGame159",
+    "squidoodly",
+    "seasnail",
+    "Minirick"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Minirick0-0/Lumen-Launcher",
+    "issues": "https://github.com/Minirick0-0/Lumen-Launcher/issues",
+    "sources": "https://github.com/Minirick0-0/Lumen-Launcher"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/meteor-client/lumen_logo.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "meteordevelopment.meteorclient.MeteorClient"
+    ],
+    "modmenu": [
+      "meteordevelopment.meteorclient.modintegration.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "meteor-client.mixins.json",
+    "meteor-client-baritone.mixins.json",
+    "meteor-client-indigo.mixins.json",
+    "meteor-client-sodium.mixins.json",
+    "meteor-client-lithium.mixins.json",
+    "meteor-client-viafabricplus.mixins.json"
+  ],
+  "accessWidener": "meteor-client.classtweaker",
+  "custom": {
+    "meteor-client:build_number": "${build_number}",
+    "meteor-client:color": "99,102,241",
+    "meteor-client:commit": "${commit}",
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://github.com/Minirick0-0/Lumen-Launcher"
+      }
+    },
+    "badoptimizations:cache_hooks": {
+      "lightmap": "meteordevelopment.meteorclient.modintegration.BadOptimizationsHook"
+    }
+  },
+  "depends": {
+    "java": ">=${jdk_version}",
+    "minecraft": "${minecraft_version}",
+    "fabricloader": ">=${loader_version}"
+  },
+  "breaks": {
+    "optifabric": "*",
+    "feather": "*",
+    "origins": "*",
+    "sodium": "<0.8.7",
+    "morechathistory": "*",
+    "lithium": "<0.22.1"
+  }
+}

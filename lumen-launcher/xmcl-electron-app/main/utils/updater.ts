@@ -120,7 +120,7 @@ async function downloadAsarUpdate(
 }
 
 async function hintUserDownload(): Promise<void> {
-  shell.openExternal('https://xmcl.app')
+  shell.openExternal('https://github.com/Minirick0-0/Lumen-Launcher/releases/latest')
 }
 
 async function downloadAppInstaller(
@@ -243,67 +243,41 @@ export class ElectronUpdater implements LauncherAppUpdater {
 
   async #getUpdateFromSelfHost(): Promise<ReleaseInfo> {
     const app = this.app
-    this.logger.log('Try get update from selfhost')
-    const { allowPrerelease, locale } = await app.registry.get(kSettings)
-    const queryString = `version=v${app.version}&prerelease=${allowPrerelease || false}`
-    const response = await this.app
-      .fetch(`https://api.xmcl.app/latest?${queryString}`, {
-        headers: {
-          'Accept-Language': locale,
-        },
-      })
-      .catch(() =>
-        this.app.fetch(`https://xmcl-core-api.azurewebsites.net/api/latest?${queryString}`, {
-          headers: {
-            'Accept-Language': locale,
-          },
-        }),
-      )
+    this.logger.log('Checking Lumen Launcher releases on GitHub')
+    const response = await this.app.fetch(
+      'https://api.github.com/repos/Minirick0-0/Lumen-Launcher/releases/latest',
+      { headers: { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' } },
+    )
     if (!response.ok) {
       throw new AnyError(
         'UpdateError',
-        `Fail to get update from selfhost: ${await response.text()}`,
+        `Fail to get Lumen Launcher release: ${await response.text()}`,
         {},
         { status: response.status },
       )
     }
     const result = (await response.json()) as any
-    const files = result.assets.map((a: any) => ({
+    const files = (result.assets ?? []).map((a: any) => ({
       url: a.browser_download_url,
       name: a.name,
     })) as Array<{ url: string; name: string }>
-    const platformString =
-      app.platform.os === 'windows' ? 'win' : app.platform.os === 'osx' ? 'mac' : 'linux'
-    const version = result.tag_name.substring(1)
+
+    // tag_name is the semver tag, e.g. "v0.56.7" — strip leading 'v' for comparison
+    const remoteVersion = result.tag_name?.startsWith('v')
+      ? result.tag_name.substring(1)
+      : result.tag_name
+
     const updateInfo: ReleaseInfo = {
       name: result.tag_name,
-      body: result.body,
+      body: result.body ?? '',
       date: result.published_at,
       files,
-      newUpdate: !isSameVersion(app.version, result.tag_name),
+      newUpdate: !isSameVersion(app.version, remoteVersion),
+      // ZIP distribution: always redirect user to GitHub releases page
       operation: ElectronUpdateOperation.Manual,
     }
 
-    const hasAsar = files.some((f) => f.name === `app-${version}-${platformString}.asar`)
-    if (this.app.platform.os === 'windows') {
-      if (this.app.env === 'appx') {
-        updateInfo.operation = ElectronUpdateOperation.Appx
-      } else {
-        updateInfo.operation = hasAsar
-          ? ElectronUpdateOperation.Asar
-          : ElectronUpdateOperation.Manual
-      }
-    } else if (this.app.platform.os === 'osx') {
-      updateInfo.operation = hasAsar ? ElectronUpdateOperation.Asar : ElectronUpdateOperation.Manual
-    } else {
-      updateInfo.operation =
-        hasAsar && this.app.env !== 'appimage'
-          ? ElectronUpdateOperation.Asar
-          : ElectronUpdateOperation.Manual
-    }
-
-    this.logger.log(`Got operation=${updateInfo.operation} update from selfhost`)
-
+    this.logger.log(`Remote version=${remoteVersion}, local=${app.version}, newUpdate=${updateInfo.newUpdate}`)
     return updateInfo
   }
 

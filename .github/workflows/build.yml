@@ -119,23 +119,23 @@ jobs:
         run: |
           echo "version=$(node -p "require('./lumen-launcher/package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Delete existing latest release and tag
+      - name: Delete existing versioned release if re-running same version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+        run: gh release delete "v${{ steps.ver.outputs.version }}" --yes --cleanup-tag 2>/dev/null || true
 
       - name: Publish Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create latest \
+          gh release create "v${{ steps.ver.outputs.version }}" \
             --title "Lumen Launcher v${{ steps.ver.outputs.version }}" \
             --notes "## Lumen Launcher v${{ steps.ver.outputs.version }}
 
           | Plataforma | Archivo |
           |------------|---------|
-          | 🪟 Windows x64 | \`lumen-launcher-windows-x64.zip\` |
-          | 🐧 Linux x64   | \`lumen-launcher-linux-x64.zip\`   |
+          | Windows x64 | \`lumen-launcher-windows-x64.zip\` |
+          | Linux x64   | \`lumen-launcher-linux-x64.zip\`   |
 
           **Windows:** Extrae el ZIP → ejecuta \`lumen-launcher.exe\` (portable, sin instalación).
           **Linux:** Extrae el ZIP → ejecuta \`./linux-unpacked/lumen-launcher\`.
