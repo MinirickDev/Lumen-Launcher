@@ -7,11 +7,14 @@
   >
     <span class="lumen-play-btn__glow" aria-hidden="true" />
 
-    <!-- Meteor icon -->
-    <svg class="lumen-play-btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M21 3L9 15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
-      <path d="M21 3H14M21 3V10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M11 13L7 17M8 16L4 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.55" />
+    <!-- Lumen icon -->
+    <svg class="lumen-play-btn__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="0" y="2.5" width="6" height="2.2" rx="1.1" fill="currentColor"/>
+      <rect x="0" y="7" width="4.8" height="2.2" rx="1.1" fill="currentColor" opacity="0.72"/>
+      <rect x="0" y="11.5" width="3.6" height="2.2" rx="1.1" fill="currentColor" opacity="0.48"/>
+      <path d="M13 4.5L18.5 7.5L13 10.5L7.5 7.5Z" fill="currentColor"/>
+      <path d="M18.5 7.5V13.5L13 16.5V10.5Z" fill="currentColor" opacity="0.62"/>
+      <path d="M7.5 7.5V13.5L13 16.5V10.5Z" fill="currentColor" opacity="0.8"/>
     </svg>
 
     <span class="lumen-play-btn__labels">

@@ -46,7 +46,7 @@ export function useInstanceCreation(gameProfile: Ref<GameProfile>, instances: Re
     mcOptions: [] as string[],
     maxMemory: undefined,
     minMemory: undefined,
-    author: gameProfile.value.name,
+    author: 'Minirick',
     fileApi: '',
     description: '',
     resolution: undefined,
@@ -99,7 +99,7 @@ export function useInstanceCreation(gameProfile: Ref<GameProfile>, instances: Re
     data.mcOptions = []
     data.maxMemory = 0
     data.minMemory = 0
-    data.author = gameProfile.value.name
+    data.author = 'Minirick'
     data.description = ''
     data.resolution = undefined
     data.url = ''

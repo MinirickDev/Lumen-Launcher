@@ -19,6 +19,9 @@
           </div>
         </Transition>
         <HomeGrid />
+        <div class="px-1 mt-3 mb-1">
+          <HomeLumenClientButton />
+        </div>
         <HomeUpstreamCurseforge
           v-if="instance.upstream && instance.upstream.type === 'curseforge-modpack'"
           :id="instance.upstream.modId"
@@ -47,6 +50,7 @@ import { useTutorial } from '@/composables/tutorial'
 import { useInFocusMode } from '@/composables/uiLayout'
 import { injection } from '@/util/inject'
 import type { DriveStep } from 'driver.js'
+import HomeLumenClientButton from '@/components/HomeLumenClientButton.vue'
 import HomeCriticalError from './HomeCriticalError.vue'
 import HomeFocusFooter from './HomeFocusFooterV2.vue'
 import HomeGrid from './HomeGrid.vue'

@@ -6,7 +6,6 @@
         key="launch-button-group"
         class="flex flex-wrap justify-end items-center gap-y-6 gap-x-2 flex-grow"
       >
-        <HomeLumenClientButton class="mr-auto" />
         <HomeLaunchButtonStatus
           class="mr-4 ml-2"
           :active="active"
@@ -21,7 +20,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import HomeLumenClientButton from '@/components/HomeLumenClientButton.vue'
 import HomeLaunchButton from './HomeLaunchButton.vue'
 import HomeLaunchButtonStatus from './HomeLaunchButtonStatus.vue'
 import HomeFooterCard from './HomeFooterCard.vue'
