@@ -17,7 +17,9 @@ jobs:
           fetch-depth: 0
 
       - name: Push mirror to Lumen-Launcher
+        env:
+          TOKEN: ${{ secrets.MIRROR_TOKEN }}
         run: |
-          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/MinirickDev/Lumen-Launcher.git
+          git remote add mirror "https://${TOKEN}@github.com/MinirickDev/Lumen-Launcher.git"
           git push mirror --force --all
           git push mirror --force --tags
