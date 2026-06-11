@@ -25,6 +25,7 @@ import StoreEntry from '@/views/StoreEntry.vue'
 import StoreProjectCurseforge from '@/views/StoreProjectCurseforge.vue'
 import StoreProjectFeedTheBeast from '@/views/StoreProjectFeedTheBeast.vue'
 import StoreProjectModrinth from '@/views/StoreProjectModrinth.vue'
+import StoreWebBrowser from '@/views/StoreWebBrowser.vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 export const router = createRouter({
@@ -91,6 +92,10 @@ export const router = createRouter({
         {
           path: '',
           component: StoreEntry,
+        },
+        {
+          path: 'web/:site?',
+          component: StoreWebBrowser,
         },
         {
           path: 'modrinth/:id',

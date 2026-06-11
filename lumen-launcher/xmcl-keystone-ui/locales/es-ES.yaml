@@ -974,6 +974,7 @@ setting:
   backgroundType: Tipo de Fondo
   backgroundTypeDescription: Muestra efectos especiales en el fondo (esto puede afectar el rendimiento)
   backgroundTypes:
+    minecraft: Minecraft (artwork/tráiler de la versión)
     halo: Halo
     image: Imagen
     none: Ninguno

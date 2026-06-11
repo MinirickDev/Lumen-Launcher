@@ -3,8 +3,14 @@
     <transition
       name="fade-transition"
     >
+      <MinecraftVersionBackground
+        v-if="backgroundType === BackgroundType.MINECRAFT"
+        class="absolute z-0 h-full w-full"
+        :minecraft-version="minecraftVersion"
+        :style="{ filter: `blur(${blur}px)` }"
+      />
       <MinecraftPanorama
-        v-if="backgroundType === BackgroundType.PANORAMA"
+        v-else-if="backgroundType === BackgroundType.PANORAMA"
         class="absolute z-0 h-full w-full"
         :minecraft-version="minecraftVersion"
       />
@@ -53,6 +59,7 @@
 <script lang="ts" setup>
 import Halo from '@/components/Halo.vue'
 import MinecraftPanorama from '@/components/MinecraftPanorama.vue'
+import MinecraftVersionBackground from '@/components/MinecraftVersionBackground.vue'
 import Particles from '@/components/Particles.vue'
 import { kInstance } from '@/composables/instance'
 import { injection } from '@/util/inject'

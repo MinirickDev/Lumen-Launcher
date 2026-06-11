@@ -69,6 +69,26 @@
       :description="t('setting.backgroundTypeDescription')"
       :items="backgroundTypes"
     />
+    <SettingItem
+      v-if="backgroundType === 'minecraft' && versionVideoMajor"
+      title="Video de la versión"
+      :description="`URL de YouTube o mp4/webm para Minecraft ${versionVideoMajor}. Déjalo vacío para usar el artwork oficial de Mojang de la versión.`"
+      long-action
+    >
+      <template #action>
+        <v-text-field
+          v-model="versionVideoUrl"
+          class="version-video-field"
+          variant="outlined"
+          density="compact"
+          hide-details
+          clearable
+          placeholder="https://www.youtube.com/watch?v=…"
+          @change="saveVersionVideo"
+          @click:clear="versionVideoUrl = ''; saveVersionVideo()"
+        />
+      </template>
+    </SettingItem>
     <v-divider v-if="!props.dense" class="my-3" />
     <SettingItemCheckbox
       v-model="backgroundColorOverlay"
@@ -397,6 +417,7 @@
 import SettingItem from '@/components/SettingItem.vue'
 import SettingItemCheckbox from '@/components/SettingItemCheckbox.vue'
 import SettingItemSelect from '@/components/SettingItemSelect.vue'
+import { kInstance } from '@/composables/instance'
 import { useService } from '@/composables/service'
 import { BackgroundType, UIThemeDataV1, useThemeWritter } from '@/composables/theme'
 import { basename } from '@/util/basename'
@@ -415,6 +436,31 @@ const props = defineProps<{
 }>()
 const { showOpenDialog, showSaveDialog } = windowController
 const { t } = useI18n()
+
+// Per-version background video override for the Minecraft background type
+const appearanceInstance = inject(kInstance, undefined)
+const versionVideoMajor = computed(() =>
+  (appearanceInstance?.runtime.value.minecraft ?? '').split('.').slice(0, 2).join('.'),
+)
+const versionVideoUrl = ref('')
+watch(
+  versionVideoMajor,
+  (m) => {
+    versionVideoUrl.value = m ? (localStorage.getItem(`lumen.versionVideo.${m}`) ?? '') : ''
+  },
+  { immediate: true },
+)
+function saveVersionVideo() {
+  const m = versionVideoMajor.value
+  if (!m) return
+  const key = `lumen.versionVideo.${m}`
+  if (versionVideoUrl.value) {
+    localStorage.setItem(key, versionVideoUrl.value)
+  } else {
+    localStorage.removeItem(key)
+  }
+  window.dispatchEvent(new Event('lumen-version-video-changed'))
+}
 
 const emit = defineEmits<{
   (e: 'save'): void
@@ -548,6 +594,7 @@ const backgroundImageFits = computed(() => [
   { value: 'contain', text: t('setting.backgroundImageFit.contain') },
 ])
 const backgroundTypes = computed(() => [
+  { value: BackgroundType.MINECRAFT, text: t('setting.backgroundTypes.minecraft') },
   { value: BackgroundType.PANORAMA, text: t('setting.backgroundTypes.panorama') },
   { value: BackgroundType.NONE, text: t('setting.backgroundTypes.none') },
   { value: BackgroundType.IMAGE, text: t('setting.backgroundTypes.image') },

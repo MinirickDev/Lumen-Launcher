@@ -21,6 +21,7 @@ import {
   InstanceManifestService,
 } from '@xmcl/runtime/instanceIO'
 import { JavaService } from '@xmcl/runtime/java'
+import { LumenClientService } from '@xmcl/runtime/lumen'
 import { LaunchService, VersionService } from '@xmcl/runtime/launch'
 import { ProjectMappingService } from '@xmcl/runtime/moddb'
 import { ModMetadataService } from '@xmcl/runtime/moddb/ModMetadataService'
@@ -52,6 +53,7 @@ export const definedServices = [
   PresenceService,
   JavaService,
   LaunchService,
+  LumenClientService,
   ModpackService,
   InstanceServerInfoService,
   ResourcePackPreviewService,

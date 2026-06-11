@@ -61,7 +61,14 @@ export default defineConfig({
     },
   },
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          // Electron <webview> tag used by the embedded mod-site browser
+          isCustomElement: (tag) => tag === 'webview',
+        },
+      },
+    }),
     vuetify({ autoImport: true }),
     UnoCSS(),
 

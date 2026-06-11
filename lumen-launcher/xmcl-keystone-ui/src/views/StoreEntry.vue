@@ -61,6 +61,21 @@
               </div>
             </div>
           </div>
+          <!-- Web quick access -->
+          <div class="filter-group">
+            <h3 class="filter-title">Explorar la web</h3>
+            <div class="flex gap-2">
+              <div
+                v-for="site in lumenModSites"
+                :key="site.id"
+                class="source-button surface-card-row rounded-xl relative flex-1 flex flex-col items-center justify-center p-3 cursor-pointer"
+                @click="push(`/store/web/${site.id}`)"
+              >
+                <v-icon size="24">language</v-icon>
+                <span class="text-xs font-bold mt-2">{{ site.name }}</span>
+              </div>
+            </div>
+          </div>
           <!-- Sort -->
           <div class="filter-group">
             <h3 class="filter-title">{{ t('modrinth.sort.title') }}</h3>
@@ -286,6 +301,7 @@
 
 <script lang="ts" setup>
 import CurseforgeIcon from '@/components/CurseforgeIcon.vue'
+import { lumenModSites } from '@/lumen.config'
 import FilterCard from '@/components/FilterCard.vue'
 import FTBIcon from '@/components/FTBIcon.vue'
 import ModrinthIcon from '@/components/ModrinthIcon.vue'

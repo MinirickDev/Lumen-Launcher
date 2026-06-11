@@ -67,6 +67,7 @@ import { useDefaultErrorHandler } from '@/composables/errorHandler'
 import { kInstance } from '@/composables/instance'
 import { kLaunchButton, useLaunchButton } from '@/composables/launchButton'
 import { kLocalizedContent, useLocalizedContentControl } from '@/composables/localizedContent'
+import { useLumenBrowserDownloadImport } from '@/composables/lumenBrowserDownloads'
 import { useNotifier } from '@/composables/notifier'
 import { kCompact } from '@/composables/scrollTop'
 import { kSettingsState } from '@/composables/setting'
@@ -127,6 +128,9 @@ provide(UserSkinRenderPaused, computed(() => !userProfileDialogShown.value && ro
 
 // Bind Ctrl/Cmd+K to toggle the command palette.
 useCommandPaletteHotkey()
+
+// Import mod files downloaded from the embedded web browser into the current instance
+useLumenBrowserDownloadImport()
 
 const defaultColor = useInstanceGroupDefaultColor()
 

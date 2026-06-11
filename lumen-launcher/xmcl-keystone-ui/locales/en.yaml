@@ -1224,6 +1224,7 @@ setting:
     successInstance: Instance background image updated.
     failed: Failed to set background image
   backgroundTypes:
+    minecraft: Minecraft (version artwork/trailer)
     halo: Halo
     image: Image
     none: None

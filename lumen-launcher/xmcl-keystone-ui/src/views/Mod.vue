@@ -39,6 +39,15 @@
         >
           <v-icon> layers </v-icon>
         </v-btn>
+        <v-btn
+          v-shared-tooltip="() => 'Explorar Modrinth, CurseForge y FTB en la web'"
+          icon
+          variant="text"
+          density="comfortable"
+          @click="push('/store/web/modrinth')"
+        >
+          <v-icon> language </v-icon>
+        </v-btn>
       </MarketListHeader>
       <v-alert v-if="upgradeError" dense type="error">
         {{ updateErrorMessage }}
@@ -834,7 +843,7 @@ const updateSearch = debounce(() => {
     replace({ query: { ...route.query, keyword: '' } })
   }
 }, 500)
-const { replace } = useRouter()
+const { replace, push } = useRouter()
 const keywordBuffer = ref(route.query.keyword as string)
 onMounted(() => {
   keywordBuffer.value = (route.query.keyword as string) ?? ''

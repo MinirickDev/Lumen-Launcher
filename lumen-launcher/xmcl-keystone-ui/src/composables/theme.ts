@@ -22,7 +22,9 @@ export enum BackgroundType {
   PARTICLE = 'particle',
   HALO = 'halo',
   IMAGE = 'image',
-  VIDEO = 'video' }
+  VIDEO = 'video',
+  /** Official Minecraft artwork/trailer matching the instance version */
+  MINECRAFT = 'minecraft' }
 
 export interface UIThemeDataV1 {
   dark: boolean | 'system'
@@ -103,7 +105,7 @@ export function getDefaultTheme(): UIThemeDataV1 {
     backgroundImage: undefined,
     backgroundImageDark: undefined,
     backgroundImageFit: 'cover',
-    backgroundType: BackgroundType.NONE,
+    backgroundType: BackgroundType.MINECRAFT,
     font: undefined,
     fontSize: 16,
     blur: {

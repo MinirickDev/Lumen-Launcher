@@ -1,9 +1,10 @@
 <template>
   <button
     class="lumen-play-btn"
-    :disabled="isValidating || loading"
+    :disabled="isValidating || (loading && !installing) || !supported"
     :aria-label="`Play with Lumen Client`"
-    @click="onClick()"
+    :title="supported ? undefined : `Lumen Client no está disponible para Minecraft ${minecraft}`"
+    @click="onLumenClick()"
   >
     <span class="lumen-play-btn__glow" aria-hidden="true" />
 
@@ -19,24 +20,53 @@
 
     <span class="lumen-play-btn__labels">
       <span class="lumen-play-btn__play">
-        <span v-if="loading">
+        <span v-if="loading || installing">
           <v-progress-circular indeterminate :size="12" :width="2" class="mr-1" />
         </span>
-        {{ loading ? t('launch.cancel') : t('launch.launch') }}
+        {{ installing ? 'Instalando…' : loading ? t('launch.cancel') : t('launch.launch') }}
       </span>
-      <span class="lumen-play-btn__sub">Lumen Client · Meteor</span>
+      <span class="lumen-play-btn__sub">{{ installed ? 'Lumen Client · Meteor' : 'Lumen Client · se descargará' }}</span>
     </span>
   </button>
 </template>
 
 <script lang="ts" setup>
-import { kLaunchButton } from '@/composables/launchButton'
+import { kInstance } from '@/composables/instance'
+import { kInstanceVersionInstall } from '@/composables/instanceVersionInstall'
 import { kInstances } from '@/composables/instances'
+import { kLaunchButton } from '@/composables/launchButton'
+import { useLumenClientInstall } from '@/composables/lumenClient'
+import { useNotifier } from '@/composables/notifier'
 import { injection } from '@/util/inject'
 
 const { onClick, loading } = injection(kLaunchButton)
 const { isValidating } = injection(kInstances)
+const { fix: fixVersionIssues } = injection(kInstanceVersionInstall)
+const { runtime } = injection(kInstance)
+const { ensureLumenClient, installing, installed, supported } = useLumenClientInstall()
+const { notify } = useNotifier()
 const { t } = useI18n()
+
+const minecraft = computed(() => runtime.value.minecraft)
+
+async function onLumenClick() {
+  // While launching/cancelling, behave exactly like the normal launch button
+  if (loading.value || installing.value) {
+    return onClick()
+  }
+  try {
+    await ensureLumenClient()
+    // Installing the Fabric loader may leave the version uninstalled; fix it
+    // before delegating to the regular launch chain.
+    await fixVersionIssues()
+    await onClick()
+  } catch (e) {
+    notify({
+      level: 'error',
+      title: `No se pudo instalar Lumen Client: ${e instanceof Error ? e.message : e}`,
+    })
+  }
+}
 </script>
 
 <style scoped>
