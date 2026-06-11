@@ -19,6 +19,10 @@ Maintained by **Minirick** — https://github.com/Minirick0-0/Lumen-Launcher
 
 ### What was changed
 - Rebranded UI to "Lumen Client" with indigo color scheme (99, 102, 241)
+- Removed combat modules (KillAura, AnchorAura, CrystalAura, BedAura, BowAimbot, AutoTotem, etc.)
+- Removed player-targeting ESP and Tracers (ESP, Tracers, Chams, Nametags, WallHack, etc.)
+- Removed movement cheats (Flight, Speed, NoSlow, Jesus, Scaffold, Spider, etc.)
+- Kept: Freecam, Fullbright, Zoom, HUD, Coordinates, FPS counter, Inventory Tweaks, Baritone
 
 ### What was kept
 All original Meteor Client functionality not listed above remains unchanged and is credited
