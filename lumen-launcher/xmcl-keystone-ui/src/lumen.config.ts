@@ -17,6 +17,20 @@ export const lumenConfig = {
  * downloaded. Publish the jar of each supported Minecraft version as a
  * GitHub release asset following the url pattern of `downloadUrl`.
  */
+/** Lumen cube icon as an inline SVG data URI, used for the Lumen instance. */
+export const lumenClientIcon =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">' +
+      '<rect x="0" y="2.5" width="6" height="2.2" rx="1.1" fill="#7c3aed"/>' +
+      '<rect x="0" y="7" width="4.8" height="2.2" rx="1.1" fill="#7c3aed" opacity="0.72"/>' +
+      '<rect x="0" y="11.5" width="3.6" height="2.2" rx="1.1" fill="#7c3aed" opacity="0.48"/>' +
+      '<path d="M13 4.5L18.5 7.5L13 10.5L7.5 7.5Z" fill="#a855f7"/>' +
+      '<path d="M18.5 7.5V13.5L13 16.5V10.5Z" fill="#7c3aed" opacity="0.62"/>' +
+      '<path d="M7.5 7.5V13.5L13 16.5V10.5Z" fill="#7c3aed" opacity="0.8"/>' +
+      '</svg>',
+  )
+
 export const lumenClientConfig = {
   name: 'Lumen Client',
   /** Minecraft versions with a published Lumen Client jar */

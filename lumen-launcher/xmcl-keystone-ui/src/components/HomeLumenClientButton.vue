@@ -119,9 +119,17 @@ async function onLumenClick() {
       notify({ level: 'info', title: `Cambiando a la instancia ${target.minecraft} de Lumen Client` })
       await waitForInstance(target.path)
     }
-    await ensureLumenClient(target)
-    // Installing the Fabric loader may leave the version uninstalled; fix it
-    // before delegating to the regular launch chain.
+    const { fabricOk } = await ensureLumenClient(target)
+    if (!fabricOk) {
+      // The jar is in mods/, but without Fabric it won't load. Tell the user
+      // instead of silently launching vanilla.
+      notify({
+        level: 'error',
+        title: `Fabric no está disponible para Minecraft ${target.minecraft}. El cliente no se cargará hasta que exista soporte de Fabric para esa versión.`,
+      })
+      return
+    }
+    // Resolve any remaining version issues (libraries, assets…) before launch.
     await fixVersionIssues()
     // Set before launching so the presence survives the game-start event
     setPlaying('Jugando "Lumen Client"').catch(() => {})

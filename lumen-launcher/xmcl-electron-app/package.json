@@ -2,7 +2,7 @@
     "name": "lumen-launcher",
     "private": true,
     "main": "./index.js",
-    "version": "0.57.1",
+    "version": "0.57.2",
     "author": "ci010 <cijhn@hotmail.com>",
     "description": "Lumen Launcher - A minimalist, modern Minecraft launcher",
     "license": "MIT",

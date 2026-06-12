@@ -1,13 +1,15 @@
-import { lumenClientConfig } from '@/lumen.config'
+import { lumenClientConfig, lumenClientIcon } from '@/lumen.config'
 import { clientModrinthV2 } from '@/util/clients'
 import { injection } from '@/util/inject'
+import { getSWRV } from '@/util/swrvGet'
 import { useLocalStorage } from '@vueuse/core'
-import { InstanceServiceKey, LumenClientModFile, LumenClientServiceKey } from '@xmcl/runtime-api'
+import { InstallServiceKey, InstanceServiceKey, LumenClientModFile, LumenClientServiceKey } from '@xmcl/runtime-api'
 import { Ref } from 'vue'
 import { kInstance } from './instance'
-import { useInstanceModLoaderDefault } from './instanceModLoaderDefault'
+import { getFabricGameVersionsModel, getFabricLoaderVersionsModel } from './version'
 import { kInstances } from './instances'
 import { useService } from './service'
+import { useSWRVConfig } from './swrvConfig'
 
 export interface LumenClientInstall {
   /** Whether the install/check is currently running */
@@ -22,7 +24,7 @@ export interface LumenClientInstall {
    * version. Returns the instance the client should be installed into.
    */
   ensureLumenInstance(): Promise<{ path: string; minecraft: string }>
-  ensureLumenClient(target?: { path: string; minecraft: string }): Promise<void>
+  ensureLumenClient(target?: { path: string; minecraft: string }): Promise<{ fabricOk: boolean }>
   /**
    * Select the dedicated Lumen Client instance (creating it if needed),
    * regardless of which instance is currently selected.
@@ -43,8 +45,9 @@ export function useLumenClientInstall(): LumenClientInstall {
   const { path, runtime } = injection(kInstance)
   const { instances, selectedInstance } = injection(kInstances)
   const { ensureMods, getInstalledMods } = useService(LumenClientServiceKey)
-  const { createInstance } = useService(InstanceServiceKey)
-  const installModLoader = useInstanceModLoaderDefault()
+  const { createInstance, editInstance } = useService(InstanceServiceKey)
+  const { installFabric } = useService(InstallServiceKey)
+  const swrvConfig = useSWRVConfig()
 
   const installing = ref(false)
   const installed = ref(false)
@@ -82,6 +85,7 @@ export function useLumenClientInstall(): LumenClientInstall {
       lumenClientConfig.supportedVersions[lumenClientConfig.supportedVersions.length - 1]
     const created = await createInstance({
       name: lumenClientConfig.name,
+      icon: lumenClientIcon,
       runtime: { minecraft: target },
     })
     selectedInstance.value = created
@@ -100,6 +104,43 @@ export function useLumenClientInstall(): LumenClientInstall {
     return result.path
   }
 
+  /**
+   * Configure AND install the Fabric environment for the instance. Editing the
+   * runtime only sets metadata — `installFabric` actually downloads the loader,
+   * intermediary and libraries so a Fabric mod jar is loaded instead of being
+   * ignored by a vanilla launch. Returns false if Fabric can't be set up
+   * (e.g. the Minecraft version isn't supported yet).
+   */
+  async function setupFabricEnvironment(
+    instancePath: string,
+    mc: string,
+    instanceRuntime: { fabricLoader?: string; minecraft: string },
+  ): Promise<boolean> {
+    try {
+      const supportedMc = await getSWRV(getFabricGameVersionsModel(), swrvConfig)
+      if (!supportedMc.includes(mc)) {
+        return false
+      }
+      const loaders = await getSWRV(getFabricLoaderVersionsModel(), swrvConfig)
+      const loader = loaders.find((l) => l.stable) ?? loaders[0]
+      if (!loader) return false
+
+      if (instanceRuntime.fabricLoader !== loader.version) {
+        await editInstance({
+          instancePath,
+          runtime: { ...instanceRuntime, fabricLoader: loader.version },
+          version: '',
+        })
+      }
+      // Actually download the Fabric loader + libraries into the game
+      await installFabric({ loader: loader.version, minecraft: mc })
+      return true
+    } catch (e) {
+      console.warn('Failed to set up Fabric environment for Lumen Client', e)
+      return false
+    }
+  }
+
   async function ensureLumenClient(target?: { path: string; minecraft: string }) {
     const mc = target?.minecraft ?? minecraft.value
     const instancePath = target?.path ?? path.value
@@ -107,12 +148,8 @@ export function useLumenClientInstall(): LumenClientInstall {
     try {
       const instance = instances.value.find((i) => i.path === instancePath)
       const instanceRuntime = instance?.runtime ?? runtime.value
-      if (!instanceRuntime.fabricLoader) {
-        const ok = await installModLoader(instancePath, instanceRuntime, ['fabric'])
-        if (!ok) {
-          throw new Error(`Fabric Loader is not available for Minecraft ${mc}`)
-        }
-      }
+      // Set up Fabric first — a .jar mod does nothing on a vanilla instance.
+      const fabricOk = await setupFabricEnvironment(instancePath, mc, instanceRuntime)
 
       const files: LumenClientModFile[] = [
         {
@@ -153,6 +190,7 @@ export function useLumenClientInstall(): LumenClientInstall {
 
       await ensureMods({ instancePath, files, remove })
       installed.value = true
+      return { fabricOk }
     } finally {
       installing.value = false
     }
