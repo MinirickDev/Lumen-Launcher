@@ -25,14 +25,22 @@
       allow="autoplay; encrypted-media"
       tabindex="-1"
     />
-    <!-- Official Mojang artwork of the exact version -->
+    <!-- Official Mojang artwork (once loaded) -->
     <img
       v-else-if="imageUrl"
       :key="imageUrl"
       class="mc-version-bg__media mc-version-bg__kenburns"
       :src="imageUrl"
     >
-    <div v-else class="mc-version-bg__fallback" />
+    <!--
+      Fallback / loading state: show the animated Minecraft panorama while the
+      Mojang artwork is being fetched, or permanently when there is no artwork.
+      This ensures there is never a black screen.
+    -->
+    <MinecraftPanorama
+      v-else
+      :minecraft-version="minecraftVersion"
+    />
 
     <div class="mc-version-bg__vignette" />
 
@@ -76,6 +84,7 @@
 </template>
 
 <script lang="ts" setup>
+import MinecraftPanorama from '@/components/MinecraftPanorama.vue'
 import { lumenVersionVideos } from '@/lumen.config'
 
 const props = defineProps<{ minecraftVersion: string }>()
@@ -122,7 +131,7 @@ const youtubeEmbedUrl = computed(() => {
   return `https://www.youtube-nocookie.com/embed/${id}?${params}`
 })
 
-// Official artwork fallback (launchercontent.mojang.com)
+// Official artwork from Mojang patch notes
 let patchNotesPromise: Promise<PatchNote[]> | undefined
 function getPatchNotes(): Promise<PatchNote[]> {
   if (!patchNotesPromise) {
@@ -137,18 +146,25 @@ function getPatchNotes(): Promise<PatchNote[]> {
   return patchNotesPromise
 }
 
+// imageUrl starts empty so MinecraftPanorama shows immediately (no black flash).
+// It is set asynchronously once patch notes are fetched.
 const imageUrl = ref('')
 watch(
   () => props.minecraftVersion,
   async (version) => {
+    imageUrl.value = ''
     if (!version) return
     const notes = await getPatchNotes()
+    // 1st: exact version match, 2nd: same major.minor, 3rd: same major
+    const maj2 = version.split('.').slice(0, 2).join('.')
+    const maj1 = version.split('.')[0]
     const exact = notes.find((n) => n.version === version)
-    const close = notes.find((n) => n.version?.startsWith(major.value))
-    const entry = exact ?? close
-    imageUrl.value = entry?.image?.url
-      ? new URL(entry.image.url, 'https://launchercontent.mojang.com').toString()
-      : ''
+    const byMinor = notes.find((n) => n.version?.startsWith(maj2 + '.') || n.version === maj2)
+    const byMajor = notes.find((n) => n.version?.startsWith(maj1 + '.') || n.version === maj1)
+    const entry = exact ?? byMinor ?? byMajor
+    if (entry?.image?.url) {
+      imageUrl.value = new URL(entry.image.url, 'https://launchercontent.mojang.com').toString()
+    }
   },
   { immediate: true },
 )
@@ -211,21 +227,8 @@ function saveEdit() {
 }
 
 @keyframes lumen-kenburns {
-  from {
-    transform: scale(1.05) translate(0, 0);
-  }
-  to {
-    transform: scale(1.18) translate(-1.5%, -2%);
-  }
-}
-
-.mc-version-bg__fallback {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(60, 80, 60, 0.55), transparent 60%),
-    radial-gradient(ellipse at 75% 80%, rgba(40, 50, 80, 0.5), transparent 65%),
-    #07090c;
+  from { transform: scale(1.05) translate(0, 0); }
+  to   { transform: scale(1.18) translate(-1.5%, -2%); }
 }
 
 .mc-version-bg__vignette {
@@ -254,7 +257,7 @@ function saveEdit() {
   backdrop-filter: blur(12px);
   color: rgba(255, 255, 255, 0.72);
   cursor: pointer;
-  transition: opacity 0.2s ease, background 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .mc-version-bg__edit-btn:hover {
