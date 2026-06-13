@@ -1,25 +1,25 @@
-<template>
+﻿<template>
   <div class="lumen-play-group inline-flex items-stretch">
     <button
       class="lumen-play-btn"
       :disabled="isValidating || (loading && !installing)"
       :aria-label="`Play with Lumen Client`"
-      :title="supported ? undefined : `Minecraft ${minecraft} no tiene build de Lumen: se usará una instancia Lumen Client dedicada`"
       @click="onLumenClick()"
     >
       <span class="lumen-play-btn__glow" aria-hidden="true" />
 
-      <!-- Lumen icon -->
-      <LumenIcon class="lumen-play-btn__icon" :size="20" />
+      <!-- Switch to play icon once the mod is installed and ready -->
+      <v-icon v-if="installed && !installing" class="lumen-play-btn__icon" size="20">play_arrow</v-icon>
+      <LumenIcon v-else class="lumen-play-btn__icon" :size="20" />
 
       <span class="lumen-play-btn__labels">
         <span class="lumen-play-btn__play">
           <span v-if="loading || installing">
             <v-progress-circular indeterminate :size="12" :width="2" class="mr-1" />
           </span>
-          {{ installing ? 'Instalando…' : loading ? t('launch.cancel') : t('launch.launch') }}
+          {{ installing ? 'Instalando...' : loading ? t('launch.cancel') : t('launch.launch') }}
         </span>
-        <span class="lumen-play-btn__sub">{{ !supported ? 'Lumen Client · instancia dedicada' : installed ? 'Lumen Client · Meteor' : 'Lumen Client · se descargará' }}</span>
+        <span class="lumen-play-btn__sub">{{ installing ? 'Descargando dependencias...' : installed ? 'Lumen Client - Listo' : 'Lumen Client - se instalara al lanzar' }}</span>
       </span>
     </button>
 
@@ -74,8 +74,8 @@ import { PresenceServiceKey } from '@xmcl/runtime-api'
 const { onClick, loading } = injection(kLaunchButton)
 const { isValidating } = injection(kInstances)
 const { fix: fixVersionIssues } = injection(kInstanceVersionInstall)
-const { runtime, path } = injection(kInstance)
-const { ensureLumenClient, ensureLumenInstance, installing, installed, supported, enabledOptionalMods } = useLumenClientInstall()
+const { runtime } = injection(kInstance)
+const { ensureLumenClient, installing, installed, enabledOptionalMods } = useLumenClientInstall()
 const { setPlaying } = useService(PresenceServiceKey)
 const { notify } = useNotifier()
 
@@ -89,49 +89,20 @@ const { t } = useI18n()
 
 const minecraft = computed(() => runtime.value.minecraft)
 
-function waitForInstance(targetPath: string, timeout = 8000) {
-  if (path.value === targetPath) return Promise.resolve()
-  return new Promise<void>((resolve) => {
-    const timer = setTimeout(() => {
-      unwatch()
-      resolve()
-    }, timeout)
-    const unwatch = watch(path, (p) => {
-      if (p === targetPath) {
-        clearTimeout(timer)
-        unwatch()
-        resolve()
-      }
-    })
-  })
-}
-
 async function onLumenClick() {
-  // While launching/cancelling, behave exactly like the normal launch button
   if (loading.value || installing.value) {
     return onClick()
   }
   try {
-    // Switch to (or create) a compatible instance when this Minecraft
-    // version has no Lumen Client build.
-    const target = await ensureLumenInstance()
-    if (target.path !== path.value) {
-      notify({ level: 'info', title: `Cambiando a la instancia ${target.minecraft} de Lumen Client` })
-      await waitForInstance(target.path)
-    }
-    const { fabricOk } = await ensureLumenClient(target)
+    // Install Fabric + mods into the current instance - no new instance is created.
+    const { fabricOk } = await ensureLumenClient()
     if (!fabricOk) {
-      // The jar is in mods/, but without Fabric it won't load. Tell the user
-      // instead of silently launching vanilla.
       notify({
-        level: 'error',
-        title: `Fabric no está disponible para Minecraft ${target.minecraft}. El cliente no se cargará hasta que exista soporte de Fabric para esa versión.`,
+        level: 'warn',
+        title: `Fabric no disponible para Minecraft ${minecraft.value}. Los mods pueden no cargarse.`,
       })
-      return
     }
-    // Resolve any remaining version issues (libraries, assets…) before launch.
     await fixVersionIssues()
-    // Set before launching so the presence survives the game-start event
     setPlaying('Jugando "Lumen Client"').catch(() => {})
     await onClick()
   } catch (e) {
@@ -204,7 +175,6 @@ async function onLumenClick() {
   cursor: not-allowed;
 }
 
-/* Shimmer glow overlay */
 .lumen-play-btn__glow {
   position: absolute;
   inset: 0;
