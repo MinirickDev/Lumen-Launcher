@@ -17,7 +17,7 @@
           <span v-if="loading || installing">
             <v-progress-circular indeterminate :size="12" :width="2" class="mr-1" />
           </span>
-          {{ installing ? 'Instalando...' : loading ? t('launch.cancel') : t('launch.launch') }}
+          {{ installing ? 'Actualizando...' : loading ? t('launch.cancel') : t('launch.launch') }}
         </span>
         <span class="lumen-play-btn__sub">{{ installing ? 'Descargando dependencias...' : installed ? 'Lumen Client - Listo' : 'Lumen Client - se instalara al lanzar' }}</span>
       </span>
@@ -94,14 +94,29 @@ async function onLumenClick() {
     return onClick()
   }
   try {
-    // Install Fabric + mods into the current instance - no new instance is created.
+    // Always run ensureLumenClient on every launch:
+    // - checkUpdate:true inside ensures the jar is kept up to date
+    // - Fabric loader is installed/verified on every click
     const { fabricOk } = await ensureLumenClient()
+
+    // Hard block: the jar is required — without it nothing loads.
+    if (!installed.value) {
+      notify({
+        level: 'error',
+        title: `No se pudo descargar lumen-client-${minecraft.value}.jar. Comprueba tu conexion a internet e intentalo de nuevo.`,
+      })
+      return
+    }
+
+    // Hard block: Fabric is required to load the jar as a mod.
     if (!fabricOk) {
       notify({
-        level: 'warn',
-        title: `Fabric no disponible para Minecraft ${minecraft.value}. Los mods pueden no cargarse.`,
+        level: 'error',
+        title: `Fabric no esta disponible para Minecraft ${minecraft.value}. El jar de Lumen Client no se cargara sin Fabric.`,
       })
+      return
     }
+
     await fixVersionIssues()
     setPlaying('Jugando "Lumen Client"').catch(() => {})
     await onClick()
